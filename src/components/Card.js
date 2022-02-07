@@ -24,7 +24,7 @@ const Cardcontainer = ({ metricName }) => {
   if (!Object.keys(multipleLastData).includes(metricName)) return <p>no...</p>;
   const { metric, value } = multipleLastData[metricName];
   return (
-    <Card sx={{ width: 200, height: 200 }} variant="outlined">
+    <Card sx={{ width: 200, height: 200, marginLeft: '20px' }} variant="outlined">
       <CardContent>
         <Typography sx={{ fontSize: 14 }} color="text.secondary" gutterBottom>
           {metric}

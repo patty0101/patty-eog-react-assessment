@@ -28,7 +28,7 @@ const getStyles = (item, metrics, theme) => ({
           ? theme.typography.fontWeightRegular
           : theme.typography.fontWeightMedium,
 });
-const Inputarea = () => {
+const Inputarea = ({ cssStyle }) => {
   const metrics = useSelector(state => state.metrics);
   const dispatch = useDispatch();
   const theme = useTheme();
@@ -45,8 +45,8 @@ const Inputarea = () => {
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error :(</p>;
   return (
-    <div>
-      <FormControl sx={{ m: 1, width: 300 }}>
+    <div className={cssStyle}>
+      <FormControl sx={{ width: 300 }}>
         <InputLabel id="demo-multiple-chip-label">Select..</InputLabel>
         <Select
           labelId="demo-multiple-chip-label"
