@@ -17,7 +17,9 @@ const Chart = () => {
   const { loading, error, data } = useQuery(GET_SPECIFIC_DATA_QUERY, {
     variables: { input: { metricName: addedMetric, before, after } },
   });
-  const color = ['#000080', '#0000ff', '#008080', '#0000ff', '#ffa500'];
+  const color = {
+    waterTemp: '#000080', flareTemp: '#0000ff', injValveOpen: '#008080', casingPressure: '#0000ff', tubingPressure: '#ffa500', oilTemp: '#f9877f',
+  };
   useEffect(() => {
     if (!loading) {
       dispatch({ type: 'UPDATE_DATA', payload: { metric: addedMetric, measurements: data.getMeasurements } });
@@ -61,7 +63,7 @@ const Chart = () => {
         multipleData.map((item) => (
           <YAxis
             dataKey="value"
-            yAxisId={item.metric}
+            yAxisId={item.measurements[0].unit}
             type="number"
             key={item.metric}
             unit={item.measurements[0].unit}
@@ -71,15 +73,16 @@ const Chart = () => {
       <Tooltip />
       <Legend />
       {
-         multipleData.map((item, i) => (
+         multipleData.map(item => (
            <Line
              type="linear"
              dot={false}
-             yAxisId={item.metric}
+             yAxisId={item.measurements[0].unit}
              key={item.metric}
              dataKey="value"
              data={item.measurements}
-             stroke={color[i]}
+             stroke={color[item.metric]}
+             name={item.metric}
            />
          ))
       }
