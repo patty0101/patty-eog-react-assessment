@@ -31,9 +31,10 @@ const App = () => {
         {metrics.length ? metrics.map(metric => <Card key={metric} metricName={metric} />) : null}
       </div>
       <div className={classes.chartContainer}>
-        {metrics.length ? <Chart metrics={metrics} /> : null }
+        {metrics.length ? <Chart /> : null }
       </div>
     </div>
   );
 };
+
 export default App;

@@ -7,19 +7,41 @@ import {
 import moment from 'moment';
 import { GET_SPECIFIC_DATA_QUERY } from '../graphql/queries';
 
+const getTicks = (start, end) => {
+  const startMinutes = moment(start).minutes();
+  const startSeconds = moment(start).seconds();
+  const newStart = start - startSeconds * 1000;
+  const ticks = [];
+  const remainder = startMinutes % 10;
+  if (remainder === 0) {
+    ticks[0] = newStart - startSeconds * 1000;
+  } else if (remainder < 5) {
+    ticks[0] = newStart + (5 - remainder) * 1000 * 60;
+  } else {
+    ticks[0] = newStart + (10 - remainder) * 1000 * 60;
+  }
+  // eslint-disable-next-line no-plusplus
+  while (end > ticks[ticks.length - 1]) {
+    ticks.push(ticks[ticks.length - 1] + 5 * 1000 * 60);
+  }
+  return ticks;
+};
+const color = {
+  waterTemp: '#000080', flareTemp: '#0000ff', injValveOpen: '#008080', casingPressure: '#f9967f', tubingPressure: '#ffa500', oilTemp: '#f9877f',
+};
 const Chart = () => {
   const addedMetric = useSelector(state => state.addedMetric);
   const multipleData = useSelector(state => state.multipleData);
   const multipleLastData = useSelector(state => state.multipleLastData);
   const dispatch = useDispatch();
-  const before = useMemo(() => moment().valueOf(), []);
-  const after = useMemo(() => moment().subtract(30, 'minutes').valueOf(), []);
+  const input = useMemo(() => ({
+    metricName: addedMetric,
+    before: moment().valueOf(),
+    after: moment().subtract(30, 'minutes').valueOf(),
+  }), [addedMetric]);
   const { loading, error, data } = useQuery(GET_SPECIFIC_DATA_QUERY, {
-    variables: { input: { metricName: addedMetric, before, after } },
+    variables: { input },
   });
-  const color = {
-    waterTemp: '#000080', flareTemp: '#0000ff', injValveOpen: '#008080', casingPressure: '#0000ff', tubingPressure: '#ffa500', oilTemp: '#f9877f',
-  };
   useEffect(() => {
     if (!loading) {
       dispatch({ type: 'UPDATE_DATA', payload: { metric: addedMetric, measurements: data.getMeasurements } });
@@ -42,8 +64,8 @@ const Chart = () => {
   const len = firstData.measurements.length;
   return (
     <LineChart
-      width={730}
-      height={250}
+      width={800}
+      height={400}
       data={multipleData}
       margin={{
         top: 5, right: 30, left: 20, bottom: 5,
@@ -55,9 +77,8 @@ const Chart = () => {
         domain={[firstData.measurements[0].at, firstData.measurements[len - 1].at]}
         scale="time"
         type="number"
-        tickCount={6}
-        minTickGap={60}
-        tickFormatter={(unixTime) => moment(unixTime).format('HH:mm')}
+        ticks={getTicks(firstData.measurements[0].at, firstData.measurements[len - 1].at)}
+        tickFormatter={(unixTime) => moment(unixTime).format('hh:mm')}
       />
       {
         multipleData.map((item) => (
